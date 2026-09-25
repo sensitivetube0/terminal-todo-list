@@ -14,31 +14,30 @@ pub struct Todo{
 
 
 pub trait TodoInterface{
-    fn todo_command_handle(command:Command);
+    fn todo_command_handle(command:Command,file_path:&str);
     fn create_todo(todo_info:TodoInfo,file_path:&str);
     fn remove_todo(req_info:TodoInfoToUse,file_path:&str);
     fn complete_todo(req_info:TodoInfoToUse,file_path:&str);
-    fn get_all_todos() -> Vec<Todo>;
-    fn get_all_completed_todos() -> Vec<Todo>;
-    fn get_all_uncompleted_todos() -> Vec<Todo>;
+    fn get_all_todos(file_path:&str) -> Vec<Todo>;
+    fn get_all_completed_todos(file_path:&str) -> Vec<Todo>;
+    fn get_all_uncompleted_todos(file_path:&str) -> Vec<Todo>;
 }
 
 pub struct Todos{}
 
 
-const FILE_NAME:&'static str = "todo.json";
 
 
 
 
 impl TodoInterface for Todos {
 
-    fn get_all_todos() -> Vec<Todo>{
-        Todos::get_current_todos(FILE_NAME)
+    fn get_all_todos(file_path:&str) -> Vec<Todo>{
+        Todos::get_current_todos(file_path)
     }   
 
-    fn get_all_uncompleted_todos() -> Vec<Todo> {
-        Todos::get_current_todos(FILE_NAME)
+    fn get_all_uncompleted_todos(file_path:&str) -> Vec<Todo> {
+        Todos::get_current_todos(file_path)
                                 .into_iter()
                                 .filter(|todo| {
                                 !todo.completed
@@ -46,8 +45,8 @@ impl TodoInterface for Todos {
                                 .collect()
     }
 
-    fn get_all_completed_todos() -> Vec<Todo> {
-        Todos::get_current_todos(FILE_NAME)
+    fn get_all_completed_todos(file_path:&str) -> Vec<Todo> {
+        Todos::get_current_todos(file_path)
                                 .into_iter()
                                 .filter(|todo| {
                                 todo.completed
@@ -59,29 +58,29 @@ impl TodoInterface for Todos {
 
 
 
-    fn todo_command_handle(command:Command){
+    fn todo_command_handle(command:Command,file_path:&str){
 
         match command{
             Command::Add(add_info) => {
-                Todos::create_todo(add_info, FILE_NAME);
+                Todos::create_todo(add_info, file_path);
             }
             Command::List => {
-               let todos = Todos::get_all_todos();
+               let todos = Todos::get_all_todos(file_path);
                Todos::print_todos(todos);
             },
             Command::ListCompleted => {
-                let todos = Todos::get_all_completed_todos();
+                let todos = Todos::get_all_completed_todos(file_path);
                 Todos::print_todos(todos);
             },
             Command::ListNonCompleted => {
-                let todos = Todos::get_all_uncompleted_todos();
+                let todos = Todos::get_all_uncompleted_todos(file_path);
                 Todos::print_todos(todos);
             }
             Command::Remove(delete_info) => {
-                Todos::remove_todo(delete_info,FILE_NAME);
+                Todos::remove_todo(delete_info,file_path);
             },
             Command::Completed(complete_info) => {
-                Todos::complete_todo(complete_info,FILE_NAME)
+                Todos::complete_todo(complete_info,file_path);
             }
 
         }
@@ -187,7 +186,7 @@ impl Todos{
 
 
         if !path.exists(){
-            panic!("Please add a todo before trying to remove one");
+            panic!("file was removed");
         }
         let file = File::open(path).expect("Error opening file consider using reset command\n Note will remove all current todos");
 

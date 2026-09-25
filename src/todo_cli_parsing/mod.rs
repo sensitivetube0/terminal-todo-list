@@ -14,17 +14,21 @@ pub struct TodoCommands{
 #[derive(Subcommand,Debug)]
 pub enum Command{
     Add(TodoInfo),
+    Remove(TodoInfoToUse),
     List,
-    Remove(TodoInfoToDelete)
+    ListCompleted,
+    ListNonCompleted,
+    Completed(TodoInfoToUse)
+
 }
 
 
 #[derive(Args,Debug)]
-pub struct TodoInfoToDelete{
-    #[arg(conflicts_with ="todo_title")]
+pub struct TodoInfoToUse{
+    #[arg(conflicts_with ="todo_title",short = 'i',long)]
     pub todo_id:Option<u32>,
 
-    #[arg(conflicts_with ="todo_id")]
+    #[arg(conflicts_with ="todo_id",short = 't',long)]
     pub todo_title:Option<String>
 }
 
